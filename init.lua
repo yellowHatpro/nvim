@@ -46,6 +46,13 @@ local plugins = {
 		"nvim-lualine/lualine.nvim",
 		dependencies = {"nvim-tree/nvim-web-devicons"},
 	},
+	-- LSP plugins (mason, mason-lspconfig, nvim-lspconfig)
+	-- mason
+	{"williamboman/mason.nvim"},
+	--mason-lspconfig (bridges mason with nvim-lspconfig)
+	{"williamboman/mason-lspconfig.nvim"},
+	-- nvim-lspconfig
+	{"neovim/nvim-lspconfig"},
 }
 
 -- options settings
@@ -95,6 +102,22 @@ require("lualine").setup({
 		theme = "dracula"
 	}
 })
+
+-- LSP configs.
+
+-- mason
+require("mason").setup()
+
+--mason-lspconfig
+require("mason-lspconfig").setup({
+	ensure_installed = {"lua_ls"} -- contains lsp server names for different languags
+})
+
+-- lspconfig
+local lspconfig = require("lspconfig")
+
+-- setup for lua
+lspconfig.lua_ls.setup({})
 
 --apply the colorscheme
 -- equivalent to vim.cmd("colorscheme kanagawa")
