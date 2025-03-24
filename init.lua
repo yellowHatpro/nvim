@@ -40,7 +40,12 @@ local plugins = {
 			"nvim-tree/nvim-web-devicons",
     			"MunifTanjim/nui.nvim",
   		},
- 	 },	
+ 	 },
+	-- lualine
+	{
+		"nvim-lualine/lualine.nvim",
+		dependencies = {"nvim-tree/nvim-web-devicons"},
+	},
 }
 
 -- options settings
@@ -82,6 +87,13 @@ configs.setup({
 	sync_install = false,
 	highlight = {enable = true},
 	indent = {enable = true},
+})
+
+-- lualine config.
+require("lualine").setup({
+	options = {
+		theme = "dracula"
+	}
 })
 
 --apply the colorscheme
