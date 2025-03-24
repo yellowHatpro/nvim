@@ -110,7 +110,7 @@ require("mason").setup()
 
 --mason-lspconfig
 require("mason-lspconfig").setup({
-	ensure_installed = {"lua_ls"} -- contains lsp server names for different languags
+	ensure_installed = {"lua_ls", "clangd"} -- contains lsp server names for different languags
 })
 
 -- lspconfig
@@ -118,6 +118,17 @@ local lspconfig = require("lspconfig")
 
 -- setup for lua
 lspconfig.lua_ls.setup({})
+
+-- setup for clangd
+lspconfig.clangd.setup({
+	cmd = {"clangd"},
+	filetypes = {"c", "cpp"},
+	root_pattern = {
+		".clangd",
+		".git"
+	},
+	single_file_support = true
+})
 
 --apply the colorscheme
 -- equivalent to vim.cmd("colorscheme kanagawa")
