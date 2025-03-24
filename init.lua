@@ -25,11 +25,22 @@ local plugins = {
 	-- kanagawa color theme
 	{"rebelot/kanagawa.nvim",priority= 1000},
 	-- telescope fuzzy finder
-	{ "nvim-telescope/telescope.nvim", tag = "0.1.8",
+	{ 
+		"nvim-telescope/telescope.nvim", tag = "0.1.8",
 		dependencies = { "nvim-lua/plenary.nvim"}
 	},
 	-- treesitter syntax highlighting
-	{ "nvim-treesitter/nvim-treesitter", build = ":TSUpdate"}
+	{ "nvim-treesitter/nvim-treesitter", build = ":TSUpdate"},
+	-- neotree file explorer tree
+	{ 
+		"nvim-neo-tree/neo-tree.nvim",
+		branch = "v3.x",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"nvim-tree/nvim-web-devicons",
+    			"MunifTanjim/nui.nvim",
+  		},
+ 	 },	
 }
 
 -- options settings
@@ -44,6 +55,8 @@ vim.keymap.set('n', "<leader>ff", builtin.find_files, {desc = "Telescope find fi
 vim.keymap.set('n', "<leader>fg", builtin.live_grep, {desc = "Telescope find files"})
 vim.keymap.set('n', "<leader>fb", builtin.buffers, {desc = "Telescope buffers"})
 vim.keymap.set('n', "<leader>fh", builtin.help_tags, {desc = "Telescope help tags"})
+-- neotree keymap
+vim.keymap.set('n', "<leader>e", "<Cmd>Neotree toggle<CR>",{})
 
 -- configs
 
