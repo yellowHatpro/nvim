@@ -28,6 +28,8 @@ local plugins = {
 	{ "nvim-telescope/telescope.nvim", tag = "0.1.8",
 		dependencies = { "nvim-lua/plenary.nvim"}
 	},
+	-- treesitter syntax highlighting
+	{ "nvim-treesitter/nvim-treesitter", build = ":TSUpdate"}
 }
 
 -- options settings
@@ -43,6 +45,8 @@ vim.keymap.set('n', "<leader>fg", builtin.live_grep, {desc = "Telescope find fil
 vim.keymap.set('n', "<leader>fb", builtin.buffers, {desc = "Telescope buffers"})
 vim.keymap.set('n', "<leader>fh", builtin.help_tags, {desc = "Telescope help tags"})
 
+-- configs
+
 -- kanagawa config.
 -- We could have also wrapped this in a function, and passed to config parameter in the kanagawa table in plugins table.
 require("kanagawa").setup({
@@ -56,6 +60,15 @@ require("kanagawa").setup({
 		dark = "wave",
 		light = "lotus"
 		},
+})
+
+-- treesitter config.
+local configs = require("nvim-treesitter.configs")
+configs.setup({
+	ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "rust", "cpp", "javascript", "html" },
+	sync_install = false,
+	highlight = {enable = true},
+	indent = {enable = true},
 })
 
 --apply the colorscheme
