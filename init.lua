@@ -62,7 +62,9 @@ local plugins = {
 	-- nvim-lspconfig
 	{ "neovim/nvim-lspconfig" },
 
-	-- Autocompletions
+	-- Autocompletions and Snippets
+	-- cmp nvim lsp
+	{ "hrsh7th/cmp-nvim-lsp" },
 	-- LuaSnip
 	{
 		"L3MON4D3/LuaSnip",
@@ -152,26 +154,11 @@ require("mason-lspconfig").setup({
 	ensure_installed = { "lua_ls", "clangd" } -- contains lsp server names for different languags
 })
 
--- lspconfig
-local lspconfig = require("lspconfig")
--- setup for lua
-lspconfig.lua_ls.setup({})
-
--- setup for clangd
-lspconfig.clangd.setup({
-	cmd = { "clangd" },
-	filetypes = { "c", "cpp" },
-	root_pattern = {
-		".clangd",
-		".git"
-	},
-	single_file_support = true
-})
-
 
 -- Autocompletions configs.
 require("luasnip.loaders.from_vscode").lazy_load()
 local cmp = require("cmp")
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
 cmp.setup({
 	snippet = {
 		-- REQUIRED - you must specify a snippet engine
@@ -192,12 +179,34 @@ cmp.setup({
 		['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
 	}),
 	sources = cmp.config.sources({
-		--	{ name = 'nvim_lsp' },
+		{ name = 'nvim_lsp' },
 		{ name = 'luasnip' }, -- For luasnip users.
 	}, {
 		{ name = 'buffer' },
 	})
 })
+
+
+-- lspconfig
+local lspconfig = require("lspconfig")
+-- setup for lua
+lspconfig.lua_ls.setup({
+	capabilities = capabilities
+})
+
+-- setup for clangd
+lspconfig.clangd.setup({
+	capabilities = capabilities,
+	cmd = { "clangd" },
+	filetypes = { "c", "cpp" },
+	root_pattern = {
+		".clangd",
+		".git"
+	},
+	single_file_support = true
+})
+
+
 
 --apply the colorscheme
 -- equivalent to vim.cmd("colorscheme kanagawa")
