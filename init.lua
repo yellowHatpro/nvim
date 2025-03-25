@@ -23,15 +23,16 @@ vim.opt.rtp:prepend(lazypath)
 -- plugins
 local plugins = {
 	-- kanagawa color theme
-	{ "rebelot/kanagawa.nvim",           priority = 1000 },
+	{ "rebelot/kanagawa.nvim",                  priority = 1000 },
 	-- telescope fuzzy finder
 	{
 		"nvim-telescope/telescope.nvim",
 		tag = "0.1.8",
 		dependencies = { "nvim-lua/plenary.nvim" }
 	},
+	{ "nvim-telescope/telescope-ui-select.nvim" },
 	-- treesitter syntax highlighting
-	{ "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
+	{ "nvim-treesitter/nvim-treesitter",        build = ":TSUpdate" },
 	-- neotree file explorer tree
 	{
 		"nvim-neo-tree/neo-tree.nvim",
@@ -68,10 +69,16 @@ vim.keymap.set('n', "<leader>ff", builtin.find_files, { desc = "Telescope find f
 vim.keymap.set('n', "<leader>fg", builtin.live_grep, { desc = "Telescope find files" })
 vim.keymap.set('n', "<leader>fb", builtin.buffers, { desc = "Telescope buffers" })
 vim.keymap.set('n', "<leader>fh", builtin.help_tags, { desc = "Telescope help tags" })
--- neotree keymap
+
 vim.keymap.set('n', "<leader>e", "<Cmd>Neotree toggle<CR>", {})
 
 vim.keymap.set('n', "<C-s>", "<Cmd> w <CR>", { desc = "Save file" })
+
+-- LSP keymaps
+vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
+vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {})
+vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, {})
+
 
 -- configs
 
@@ -99,6 +106,17 @@ configs.setup({
 	indent = { enable = true },
 })
 
+-- telescope ui select config.
+require("telescope").setup({
+	extensions = {
+		["ui-select"] = {
+			require("telescope.themes").get_dropdown {}
+		}
+	}
+})
+
+require("telescope").load_extension("ui-select")
+
 -- lualine config.
 require("lualine").setup({
 	options = {
@@ -118,7 +136,6 @@ require("mason-lspconfig").setup({
 
 -- lspconfig
 local lspconfig = require("lspconfig")
-
 -- setup for lua
 lspconfig.lua_ls.setup({})
 
