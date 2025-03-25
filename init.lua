@@ -23,7 +23,10 @@ vim.opt.rtp:prepend(lazypath)
 -- plugins
 local plugins = {
 	-- kanagawa color theme
-	{ "rebelot/kanagawa.nvim",                  priority = 1000 },
+	{
+		"rebelot/kanagawa.nvim",
+		priority = 1000
+	},
 	-- telescope fuzzy finder
 	{
 		"nvim-telescope/telescope.nvim",
@@ -32,7 +35,10 @@ local plugins = {
 	},
 	{ "nvim-telescope/telescope-ui-select.nvim" },
 	-- treesitter syntax highlighting
-	{ "nvim-treesitter/nvim-treesitter",        build = ":TSUpdate" },
+	{
+		"nvim-treesitter/nvim-treesitter",
+		build = ":TSUpdate"
+	},
 	-- neotree file explorer tree
 	{
 		"nvim-neo-tree/neo-tree.nvim",
@@ -55,6 +61,18 @@ local plugins = {
 	{ "williamboman/mason-lspconfig.nvim" },
 	-- nvim-lspconfig
 	{ "neovim/nvim-lspconfig" },
+
+	-- Autocompletions
+	-- LuaSnip
+	{
+		"L3MON4D3/LuaSnip",
+		dependencies = {
+			"saadparwaiz1/cmp_luasnip",
+			"rafamadriz/friendly-snippets"
+		}
+	},
+	-- nvim-cmp
+	{ 'hrsh7th/nvim-cmp' }
 }
 
 -- options settings
@@ -100,7 +118,7 @@ require("kanagawa").setup({
 -- treesitter config.
 local configs = require("nvim-treesitter.configs")
 configs.setup({
-	ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "rust", "cpp", "javascript", "html" },
+	auto_install = true,
 	sync_install = false,
 	highlight = { enable = true },
 	indent = { enable = true },
@@ -148,6 +166,37 @@ lspconfig.clangd.setup({
 		".git"
 	},
 	single_file_support = true
+})
+
+
+-- Autocompletions configs.
+require("luasnip.loaders.from_vscode").lazy_load()
+local cmp = require("cmp")
+cmp.setup({
+	snippet = {
+		-- REQUIRED - you must specify a snippet engine
+		expand = function(args)
+			require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+			vim.snippet.expand(args.body) -- For native neovim snippets (Neovim v0.10+)
+		end,
+	},
+	window = {
+		completion = cmp.config.window.bordered(),
+		documentation = cmp.config.window.bordered(),
+	},
+	mapping = cmp.mapping.preset.insert({
+		['<C-b>'] = cmp.mapping.scroll_docs(-4),
+		['<C-f>'] = cmp.mapping.scroll_docs(4),
+		['<C-Space>'] = cmp.mapping.complete(),
+		['<C-e>'] = cmp.mapping.abort(),
+		['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+	}),
+	sources = cmp.config.sources({
+		--	{ name = 'nvim_lsp' },
+		{ name = 'luasnip' }, -- For luasnip users.
+	}, {
+		{ name = 'buffer' },
+	})
 })
 
 --apply the colorscheme
