@@ -80,7 +80,10 @@ local plugins = {
     }
   },
   -- nvim-cmp
-  { 'hrsh7th/nvim-cmp' }
+  { 'hrsh7th/nvim-cmp' },
+
+  -- autoclose brackets
+  { "m4xshen/autoclose.nvim" },
 }
 
 -- options settings
@@ -245,6 +248,8 @@ lspconfig.clangd.setup({
   single_file_support = true
 })
 
+-- autoclose bracket comfigs.
+require("autoclose").setup()
 
 
 --apply the colorscheme
