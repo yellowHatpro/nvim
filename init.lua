@@ -107,6 +107,7 @@ vim.keymap.set('n', "<C-s>", "<Cmd> w <CR>", { desc = "Save file" })
 vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
 vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {})
 vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, {})
+vim.keymap.set({ 'n', 'v' }, '<leader>ch', vim.diagnostic.open_float, {})
 
 
 -- configs
@@ -160,7 +161,7 @@ require("mason").setup()
 
 --mason-lspconfig
 require("mason-lspconfig").setup({
-  ensure_installed = { "lua_ls", "clangd" } -- contains lsp server names for different languags
+  ensure_installed = { "lua_ls", "clangd", "basedpyright" } -- contains lsp server names for different languags
 })
 
 
@@ -236,6 +237,11 @@ lspconfig.lua_ls.setup({
   capabilities = capabilities
 })
 
+-- setup for basedpyright
+lspconfig.basedpyright.setup({
+  capabilities = capabilities
+})
+
 -- setup for clangd
 lspconfig.clangd.setup({
   capabilities = capabilities,
@@ -246,6 +252,11 @@ lspconfig.clangd.setup({
     ".git"
   },
   single_file_support = true
+})
+
+--setup for tsserver
+lspconfig.ts_ls.setup({
+  capabilities = capabilities
 })
 
 -- autoclose bracket comfigs.
