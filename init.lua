@@ -6,7 +6,8 @@ vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
 vim.opt.softtabstop = 2
-
+vim.opt.number = true
+vim.clipboard = 'unnamedplus'
 -- initialize lazy plugin manager.
 
 --start
@@ -84,6 +85,27 @@ local plugins = {
 
   -- autoclose brackets
   { "m4xshen/autoclose.nvim" },
+
+  -- folke which-key
+  { "folke/which-key.nvim" },
+
+  -- akinsho/toggleterm
+  {
+    "akinsho/toggleterm.nvim",
+    version = "*",
+    config = true,
+  },
+  -- git signs
+  {
+    "lewis6991/gitsigns.nvim",
+    event = "BufReadPre",
+  },
+  -- trouble diagnostics UI
+  {
+    "folke/trouble.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    cmd = "Trouble",
+  }
 }
 
 -- options settings
@@ -92,22 +114,6 @@ local opts = {}
 require("lazy").setup(plugins, opts)
 --end
 
--- keymaps
-local builtin = require("telescope.builtin")
-vim.keymap.set('n', "<leader>ff", builtin.find_files, { desc = "Telescope find files" })
-vim.keymap.set('n', "<leader>fg", builtin.live_grep, { desc = "Telescope find files" })
-vim.keymap.set('n', "<leader>fb", builtin.buffers, { desc = "Telescope buffers" })
-vim.keymap.set('n', "<leader>fh", builtin.help_tags, { desc = "Telescope help tags" })
-
-vim.keymap.set('n', "<leader>e", "<Cmd>Neotree toggle<CR>", {})
-
-vim.keymap.set('n', "<C-s>", "<Cmd> w <CR>", { desc = "Save file" })
-
--- LSP keymaps
-vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
-vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {})
-vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, {})
-vim.keymap.set({ 'n', 'v' }, '<leader>ch', vim.diagnostic.open_float, {})
 
 
 -- configs
@@ -127,14 +133,6 @@ require("kanagawa").setup({
   },
 })
 
--- treesitter config.
-local configs = require("nvim-treesitter.configs")
-configs.setup({
-  auto_install = true,
-  sync_install = false,
-  highlight = { enable = true },
-  indent = { enable = true },
-})
 
 -- telescope ui select config.
 require("telescope").setup({
@@ -154,6 +152,46 @@ require("lualine").setup({
   }
 })
 
+-- trouble config
+require("trouble").setup({})
+
+-- gitsigns config
+
+require("gitsigns").setup({
+  signs = {
+    add = { text = "│" },
+    change = { text = "│" },
+    delete = { text = "_" },
+    topdelete = { text = "‾" },
+    changedelete = { text = "~" },
+  },
+  current_line_blame = true,
+})
+
+-- toggleterm config
+require("toggleterm").setup {
+  direction = "float",
+  open_mapping = [[<c-\]],
+  shade_terminals = true
+}
+
+--codex terminal config
+local Terminal = require("toggleterm.terminal").Terminal
+
+local codex = Terminal:new({
+  cmd = "codex",
+  direction = "float",
+  hidden = true,
+  close_on_exit = false
+})
+
+function CodexToggle()
+  codex:toggle()
+end
+
+-- autoclose bracket comfigs.
+require("autoclose").setup()
+
 -- LSP configs.
 
 -- mason
@@ -161,7 +199,7 @@ require("mason").setup()
 
 --mason-lspconfig
 require("mason-lspconfig").setup({
-  ensure_installed = { "lua_ls", "clangd", "basedpyright" } -- contains lsp server names for different languags
+  ensure_installed = { "lua_ls", "clangd", "basedpyright", "neocmake", "ts_ls" } -- contains lsp server names for different languags
 })
 
 
@@ -229,21 +267,26 @@ cmp.setup({
   })
 })
 
-
--- lspconfig
-local lspconfig = require("lspconfig")
 -- setup for lua
-lspconfig.lua_ls.setup({
-  capabilities = capabilities
+vim.lsp.config("lua_ls", {
+  capabilities = capabilities,
+  settings = {
+    Lua = {
+      runtime = { version = "LuaJIT" },
+      diagnostics = {
+        globals = { "vim" },
+      }
+    }
+  }
 })
 
 -- setup for basedpyright
-lspconfig.basedpyright.setup({
+vim.lsp.config("basedpyright", {
   capabilities = capabilities
 })
 
 -- setup for clangd
-lspconfig.clangd.setup({
+vim.lsp.config("clangd", {
   capabilities = capabilities,
   cmd = { "clangd" },
   filetypes = { "c", "cpp" },
@@ -255,15 +298,55 @@ lspconfig.clangd.setup({
 })
 
 --setup for tsserver
-lspconfig.ts_ls.setup({
+vim.lsp.config("ts_ls", {
   capabilities = capabilities
 })
 
--- autoclose bracket comfigs.
-require("autoclose").setup()
+-- keymaps
+local builtin = require("telescope.builtin")
+vim.keymap.set('n', "<leader>ff", builtin.find_files, { desc = "Telescope find files" })
+vim.keymap.set('n', "<leader>fg", builtin.live_grep, { desc = "Telescope live grep" })
+vim.keymap.set('n', "<leader>fb", builtin.buffers, { desc = "Telescope buffers" })
+vim.keymap.set('n', "<leader>fh", builtin.help_tags, { desc = "Telescope help tags" })
 
+vim.keymap.set('n', "<leader>e", "<Cmd>Neotree toggle<CR>", {})
+
+vim.keymap.set('n', "<C-s>", "<Cmd> w <CR>", { desc = "Save file" })
+
+-- LSP keymaps
+vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
+vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {})
+vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, {})
+vim.keymap.set({ 'n', 'v' }, '<leader>ch', vim.diagnostic.open_float, {})
+vim.keymap.set({ 'n', 't' }, '<leader>ai', function()
+  if vim.bo.buftype == "terminal" then
+    vim.cmd("stopinsert")
+  end
+  codex:toggle()
+end, { desc = "Toggle Codex" })
+
+
+-- gitsigns keymaps
+
+vim.keymap.set("n", "<leader>gp", ":Gitsigns preview_hunk<CR>", { desc = "Preview hunk" })
+vim.keymap.set("n", "<leader>gr", ":Gitsigns reset_hunk<CR>", { desc = "Reset hunk" })
+vim.keymap.set("n", "<leader>gb", ":Gitsigns toggle_current_line_blame<CR>", { desc = "Toggle blame" })
+vim.keymap.set("n", "]h", ":Gitsigns next_hunk<CR>", { desc = "Next hunk" })
+vim.keymap.set("n", "[h", ":Gitsigns prev_hunk<CR>", { desc = "Prev hunk" })
+
+
+-- trouble keymaps
+vim.keymap.set("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics" })
+vim.keymap.set("n", "<leader>xq", "<cmd>Trouble qflist toggle<cr>", { desc = "Quickfix" })
+vim.keymap.set("n", "<leader>xr", "<cmd>Trouble lsp_references toggle<cr>", { desc = "References" })
+vim.keymap.set("n", "<leader>xd", "<cmd>Trouble lsp_definitions toggle<cr>", { desc = "Definitions" })
 
 --apply the colorscheme
 -- equivalent to vim.cmd("colorscheme kanagawa")
 vim.cmd.colorscheme "kanagawa"
-vim.cmd([[autocmd BufWritePre * lua vim.lsp.buf.format()]]) -- Format before saving the file
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+  callback = function(args)
+    vim.lsp.buf.format({ bufnr = args.buf })
+  end,
+})
