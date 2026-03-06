@@ -37,13 +37,13 @@ local plugins = {
   -- telescope fuzzy finder
   {
     "nvim-telescope/telescope.nvim",
-    tag = "0.1.8",
     dependencies = { "nvim-lua/plenary.nvim" }
   },
   { "nvim-telescope/telescope-ui-select.nvim" },
   -- treesitter syntax highlighting
   {
     "nvim-treesitter/nvim-treesitter",
+    branch = { "master" },
     build = ":TSUpdate"
   },
   -- neotree file explorer tree
@@ -114,8 +114,6 @@ local opts = {}
 require("lazy").setup(plugins, opts)
 --end
 
-
-
 -- configs
 
 -- kanagawa config.
@@ -148,8 +146,9 @@ require("telescope").load_extension("ui-select")
 -- lualine config.
 require("lualine").setup({
   options = {
-    theme = "dracula"
-  }
+    theme = "dracula",
+    globalstatus = true,
+  },
 })
 
 -- trouble config
@@ -175,8 +174,27 @@ require("toggleterm").setup {
   shade_terminals = true
 }
 
---codex terminal config
 local Terminal = require("toggleterm.terminal").Terminal
+
+--lazygit setup
+local lazygit = Terminal:new({
+  cmd = "lazygit",
+  direction = "float",
+  float_opts = {
+    border = "rounded",
+    width = 120,
+    height = 40,
+  },
+})
+
+vim.keymap.set({ "n", "t" }, "<leader>gg", function()
+  if vim.bo.buftype == "terminal" then
+    vim.cmd("stopinsert")
+  end
+  lazygit:toggle()
+end, { desc = "Toggle Lazygit" })
+
+--codex terminal config
 
 local codex = Terminal:new({
   cmd = "codex",
@@ -188,6 +206,18 @@ local codex = Terminal:new({
 function CodexToggle()
   codex:toggle()
 end
+
+-- which key config
+local wk = require("which-key")
+wk.add({
+  { "<leader>f", group = "find" },
+  { "<leader>g", group = "git" },
+  { "<leader>x", group = "diagnostics" },
+  { "<leader>c", group = "code" },
+  { "<leader>a", group = "ai" },
+})
+
+wk.setup({})
 
 -- autoclose bracket comfigs.
 require("autoclose").setup()
@@ -304,20 +334,9 @@ vim.lsp.config("ts_ls", {
 
 -- keymaps
 local builtin = require("telescope.builtin")
-vim.keymap.set('n', "<leader>ff", builtin.find_files, { desc = "Telescope find files" })
-vim.keymap.set('n', "<leader>fg", builtin.live_grep, { desc = "Telescope live grep" })
-vim.keymap.set('n', "<leader>fb", builtin.buffers, { desc = "Telescope buffers" })
-vim.keymap.set('n', "<leader>fh", builtin.help_tags, { desc = "Telescope help tags" })
 
-vim.keymap.set('n', "<leader>e", "<Cmd>Neotree toggle<CR>", {})
 
-vim.keymap.set('n', "<C-s>", "<Cmd> w <CR>", { desc = "Save file" })
-
--- LSP keymaps
-vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
-vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {})
-vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, {})
-vim.keymap.set({ 'n', 'v' }, '<leader>ch', vim.diagnostic.open_float, {})
+-- AI keymaps
 vim.keymap.set({ 'n', 't' }, '<leader>ai', function()
   if vim.bo.buftype == "terminal" then
     vim.cmd("stopinsert")
@@ -325,14 +344,33 @@ vim.keymap.set({ 'n', 't' }, '<leader>ai', function()
   codex:toggle()
 end, { desc = "Toggle Codex" })
 
+-- Builtin keymaps
+vim.keymap.set('n', "<leader>fr", builtin.oldfiles, { desc = "Telescope recent files" })
+vim.keymap.set('n', "<leader>fc", builtin.commands, { desc = "Telescope Commands" })
+vim.keymap.set('n', "<leader>fk", builtin.keymaps, { desc = "Telescope Keymaps" })
+vim.keymap.set('n', "<leader>ff", builtin.find_files, { desc = "Telescope find files" })
+vim.keymap.set('n', "<leader>fg", builtin.live_grep, { desc = "Telescope live grep" })
+vim.keymap.set('n', "<leader>fb", builtin.buffers, { desc = "Telescope buffers" })
+vim.keymap.set('n', "<leader>fh", builtin.help_tags, { desc = "Telescope help tags" })
+
+-- LSP keymaps
+vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})
+vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {})
+vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, {})
+vim.keymap.set({ 'n', 'v' }, '<leader>ch', vim.diagnostic.open_float, {})
+vim.keymap.set('n', 'gr', vim.lsp.buf.references, { desc = "References" })
+vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, { desc = "Implementation" })
+vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, { desc = "Rename symbol" })
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = "Next diagnostic" })
 
 -- gitsigns keymaps
-
 vim.keymap.set("n", "<leader>gp", ":Gitsigns preview_hunk<CR>", { desc = "Preview hunk" })
 vim.keymap.set("n", "<leader>gr", ":Gitsigns reset_hunk<CR>", { desc = "Reset hunk" })
 vim.keymap.set("n", "<leader>gb", ":Gitsigns toggle_current_line_blame<CR>", { desc = "Toggle blame" })
 vim.keymap.set("n", "]h", ":Gitsigns next_hunk<CR>", { desc = "Next hunk" })
 vim.keymap.set("n", "[h", ":Gitsigns prev_hunk<CR>", { desc = "Prev hunk" })
+vim.keymap.set("n", "<leader>gd", "<cmd>Gitsigns diffthis<CR>", { desc = "Git diff buffer" })
 
 
 -- trouble keymaps
@@ -340,6 +378,13 @@ vim.keymap.set("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc 
 vim.keymap.set("n", "<leader>xq", "<cmd>Trouble qflist toggle<cr>", { desc = "Quickfix" })
 vim.keymap.set("n", "<leader>xr", "<cmd>Trouble lsp_references toggle<cr>", { desc = "References" })
 vim.keymap.set("n", "<leader>xd", "<cmd>Trouble lsp_definitions toggle<cr>", { desc = "Definitions" })
+
+-- Custom keymaps
+vim.keymap.set('n', "<leader>e", "<Cmd>Neotree toggle<CR>", {})
+
+vim.keymap.set('n', "<C-s>", "<Cmd> w <CR>", { desc = "Save file" })
+
+
 
 --apply the colorscheme
 -- equivalent to vim.cmd("colorscheme kanagawa")
