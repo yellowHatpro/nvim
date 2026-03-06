@@ -110,6 +110,13 @@ local plugins = {
   {
     "esmuellert/codediff.nvim",
     cmd = "CodeDiff",
+  },
+  -- ai sidekicks
+  {
+    "folke/sidekick.nvim",
+    dependencies = {
+      "folke/snacks.nvim"
+    },
   }
 }
 
@@ -261,7 +268,33 @@ require("codediff").setup({
   },
 })
 
--- autoclose bracket comfigs.
+-- sidekick configs
+require("sidekick").setup({
+  nes = {
+    enabled = false,
+  },
+  cli = {
+    default_tool = "codex",
+    mux = {
+      enabled = true,
+      backend = "tmux",
+    },
+    tools = {
+      codex = {
+        cmd = { "codex", "--enabled", "web_search_request" },
+      },
+
+      gemini = {
+        cmd = { "gemini" },
+      },
+      cursor = {
+        cmd = { "cursor-agent" },
+      },
+    }
+  }
+})
+
+-- autoclose bracket configs.
 require("autoclose").setup()
 
 -- LSP configs.
@@ -281,6 +314,12 @@ local luasnip = require("luasnip")
 local cmp = require("cmp")
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
+local has_words_before = function()
+  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+  return col ~= 0 and
+      vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+end
+
 cmp.setup({
   snippet = {
     -- REQUIRED - you must specify a snippet engine
@@ -299,13 +338,6 @@ cmp.setup({
     ['<C-e>'] = cmp.mapping.abort(),
     ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
     ['<Tab>'] = cmp.mapping(function(fallback)
-      local has_words_before = function()
-        unpack = unpack or table.unpack
-        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-        return col ~= 0 and
-            vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") ==
-            nil
-      end
       if cmp.visible() then
         cmp.select_next_item()
         -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
@@ -425,6 +457,15 @@ vim.keymap.set("n", "<leader>xd", "<cmd>Trouble lsp_definitions toggle<cr>", { d
 vim.keymap.set("n", "<leader>dc", "<cmd>CodeDiff --side-by-side<CR>", { desc = "CodeDiff current file" })
 vim.keymap.set("n", "<leader>di", "<cmd>CodeDiff --inline<CR>", { desc = "CodeDiff inline" })
 vim.keymap.set("n", "<leader>dh", "<cmd>CodeDiff history<CR>", { desc = "CodeDiff history" })
+
+
+-- sidekick keymaps
+vim.keymap.set("n", "<leader>aa", "<cmd>Sidekick cli select<CR>", { desc = "Select AI tool" })
+vim.keymap.set("n", "<leader>ac", "<cmd>Sidekick cli show name=codex<CR>", { desc = "Open Codex" })
+vim.keymap.set("n", "<leader>am", "<cmd>Sidekick cli show name=gemini<CR>", { desc = "Open Gemini" })
+vim.keymap.set("n", "<leader>ar", "<cmd>Sidekick cli show name=cursor<CR>", { desc = "Open Cursor Agent" })
+vim.keymap.set("n", "<leader>at", "<cmd>Sidekick cli toggle<CR>", { desc = "Toggle Sidekick terminal" })
+vim.keymap.set("n", "<leader>ap", "<cmd>Sidekick cli prompt<CR>", { desc = "Sidekick prompt" })
 
 -- Custom keymaps
 vim.keymap.set('n', "<leader>e", "<Cmd>Neotree toggle<CR>", {})
