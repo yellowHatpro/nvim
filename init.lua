@@ -105,6 +105,11 @@ local plugins = {
     "folke/trouble.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     cmd = "Trouble",
+  },
+  -- code diff
+  {
+    "esmuellert/codediff.nvim",
+    cmd = "CodeDiff",
   }
 }
 
@@ -136,7 +141,7 @@ require("kanagawa").setup({
 require("telescope").setup({
   extensions = {
     ["ui-select"] = {
-      require("telescope.themes").get_dropdown {}
+      require("telescope.themes").get_dropdown({})
     }
   }
 })
@@ -215,9 +220,46 @@ wk.add({
   { "<leader>x", group = "diagnostics" },
   { "<leader>c", group = "code" },
   { "<leader>a", group = "ai" },
+  { "<leader>d", group = "diff" },
 })
 
 wk.setup({})
+
+
+-- codediff config
+require("codediff").setup({
+  highlights = {
+    line_insert = "DiffAdd",
+    line_delete = "DiffDelete",
+    char_brightness = 1.2,
+  },
+
+  diff = {
+    layout = "side-by-side",
+    original_position = "left",
+    disable_inlay_hints = true,
+    ignore_trim_whitespace = false,
+    cycle_next_hunk = true,
+    cycle_next_file = true,
+  },
+
+  explorer = {
+    position = "bottom",
+    height = 12,
+    initial_focus = "modified",
+    focus_on_select = true,
+    view_mode = "tree",
+    flatten_dirs = true,
+    indent_markers = true,
+  },
+
+  history = {
+    position = "bottom",
+    height = 12,
+    initial_focus = "history",
+    view_mode = "list",
+  },
+})
 
 -- autoclose bracket comfigs.
 require("autoclose").setup()
@@ -378,6 +420,11 @@ vim.keymap.set("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc 
 vim.keymap.set("n", "<leader>xq", "<cmd>Trouble qflist toggle<cr>", { desc = "Quickfix" })
 vim.keymap.set("n", "<leader>xr", "<cmd>Trouble lsp_references toggle<cr>", { desc = "References" })
 vim.keymap.set("n", "<leader>xd", "<cmd>Trouble lsp_definitions toggle<cr>", { desc = "Definitions" })
+
+-- codediff keymaps
+vim.keymap.set("n", "<leader>dc", "<cmd>CodeDiff --side-by-side<CR>", { desc = "CodeDiff current file" })
+vim.keymap.set("n", "<leader>di", "<cmd>CodeDiff --inline<CR>", { desc = "CodeDiff inline" })
+vim.keymap.set("n", "<leader>dh", "<cmd>CodeDiff history<CR>", { desc = "CodeDiff history" })
 
 -- Custom keymaps
 vim.keymap.set('n', "<leader>e", "<Cmd>Neotree toggle<CR>", {})
