@@ -8,6 +8,8 @@ vim.opt.expandtab = true
 vim.opt.softtabstop = 2
 vim.opt.number = true
 vim.clipboard = 'unnamedplus'
+vim.opt.hidden = true
+
 -- initialize lazy plugin manager.
 
 --start
@@ -93,7 +95,12 @@ local plugins = {
   {
     "akinsho/toggleterm.nvim",
     version = "*",
-    config = true,
+  },
+  -- akinsho/bufferline
+  {
+    "akinsho/bufferline.nvim",
+    version = "*",
+    requires = "nvim-tree/nvim-web-devicons"
   },
   -- git signs
   {
@@ -179,20 +186,30 @@ require("gitsigns").setup({
   current_line_blame = true,
 })
 
--- toggleterm config
-require("toggleterm").setup {
-  direction = "float",
-  open_mapping = [[<c-\]],
-  shade_terminals = true
-}
+-- bufferline config
+require("bufferline").setup({
+  options = {
+    mode = "buffers",
+    diagnostics = false,
+    separator_style = "slant",
+  },
+})
 
+-- toggleterm config
 require("toggleterm").setup({
   size = 15,
   open_mapping = [[<C-j>]],
-  direction = "horizontal",
+  insert_mappings = true,
+  terminal_mappings = true,
   start_in_insert = true,
-  shade_terminals = true,
   persist_size = true,
+  persist_mode = true,
+  close_on_exit = false,
+  shade_terminals = false,
+  direction = "horizontal",
+  on_open = function(term)
+    vim.cmd("startinsert")
+  end,
 })
 
 local Terminal = require("toggleterm.terminal").Terminal
@@ -478,6 +495,21 @@ vim.keymap.set("n", "<leader>ap", "<cmd>Sidekick cli prompt<CR>", { desc = "Side
 
 --terminal keymaps
 vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]])
+
+vim.keymap.set("n", "<C-j>", [[<Cmd>exe v:count1 . "ToggleTerm"<CR>]], { silent = true })
+
+-- terminal mode: exit terminal mode, then apply the same count-aware toggle
+vim.keymap.set("t", "<C-j>", [[<C-\><C-n><Cmd>exe v:count1 . "ToggleTerm"<CR>]], { silent = true })
+
+-- picker UI for switching terminals
+vim.keymap.set("n", "<leader>tt", "<cmd>TermSelect<CR>", { silent = true, desc = "Select terminal" })
+vim.keymap.set("t", "<leader>tt", [[<C-\><C-n><cmd>TermSelect<CR>]], { silent = true, desc = "Select terminal" })
+
+-- easier movement out of terminal windows
+vim.keymap.set("t", "<C-h>", [[<Cmd>wincmd h<CR>]], { silent = true })
+vim.keymap.set("t", "<C-k>", [[<Cmd>wincmd k<CR>]], { silent = true })
+vim.keymap.set("t", "<C-l>", [[<Cmd>wincmd l<CR>]], { silent = true })
+vim.keymap.set("t", "<C-w>", [[<C-\><C-n><C-w>]], { silent = true })
 
 -- Custom keymaps
 vim.keymap.set('n', "<leader>e", "<Cmd>Neotree toggle<CR>", {})
