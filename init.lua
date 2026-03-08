@@ -186,6 +186,15 @@ require("toggleterm").setup {
   shade_terminals = true
 }
 
+require("toggleterm").setup({
+  size = 15,
+  open_mapping = [[<C-j>]],
+  direction = "horizontal",
+  start_in_insert = true,
+  shade_terminals = true,
+  persist_size = true,
+})
+
 local Terminal = require("toggleterm.terminal").Terminal
 
 --lazygit setup
@@ -281,7 +290,7 @@ require("sidekick").setup({
     },
     tools = {
       codex = {
-        cmd = { "codex", "--enabled", "web_search_request" },
+        cmd = { "codex" },
       },
 
       gemini = {
@@ -467,12 +476,13 @@ vim.keymap.set("n", "<leader>ar", "<cmd>Sidekick cli show name=cursor<CR>", { de
 vim.keymap.set("n", "<leader>at", "<cmd>Sidekick cli toggle<CR>", { desc = "Toggle Sidekick terminal" })
 vim.keymap.set("n", "<leader>ap", "<cmd>Sidekick cli prompt<CR>", { desc = "Sidekick prompt" })
 
+--terminal keymaps
+vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]])
+
 -- Custom keymaps
 vim.keymap.set('n', "<leader>e", "<Cmd>Neotree toggle<CR>", {})
 
 vim.keymap.set('n', "<C-s>", "<Cmd> w <CR>", { desc = "Save file" })
-
-
 
 --apply the colorscheme
 -- equivalent to vim.cmd("colorscheme kanagawa")
