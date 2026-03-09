@@ -205,7 +205,7 @@ require("toggleterm").setup({
   persist_size = true,
   persist_mode = true,
   close_on_exit = false,
-  shade_terminals = false,
+  shade_terminals = true,
   direction = "horizontal",
   on_open = function(term)
     vim.cmd("startinsert")
@@ -509,7 +509,7 @@ vim.keymap.set("t", "<leader>tt", [[<C-\><C-n><cmd>TermSelect<CR>]], { silent = 
 vim.keymap.set("t", "<C-h>", [[<Cmd>wincmd h<CR>]], { silent = true })
 vim.keymap.set("t", "<C-k>", [[<Cmd>wincmd k<CR>]], { silent = true })
 vim.keymap.set("t", "<C-l>", [[<Cmd>wincmd l<CR>]], { silent = true })
-vim.keymap.set("t", "<C-w>", [[<C-\><C-n><C-w>]], { silent = true })
+vim.keymap.set("t", "<C-;>", [[<C-\><C-n><C-w>]], { silent = true })
 
 -- Custom keymaps
 vim.keymap.set('n', "<leader>e", "<Cmd>Neotree toggle<CR>", {})
